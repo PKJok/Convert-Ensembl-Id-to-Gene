@@ -1,0 +1,27 @@
+# script to convert ensembl gene Id to gene symbols
+# setwd("......")
+
+library(biomaRt)
+library(annotables)
+library(org.Hs.eg.db)
+library(EnsDb.Hsapiens.v86)
+library(tidyverse)
+
+# input list of Ensembl ID's
+ensembl.ids <- read.delim('Ensembl_ids.txt', header = FALSE)
+
+
+# biomaRt method 
+listEnsembl()
+ensembl <- useEnsembl(biomart = "genes")
+datasets <- listDatasets(ensembl)
+
+ensembl.con <- useMart("ensembl", dataset = 'hsapiens_gene_ensembl')
+
+attr <- listAttributes(ensembl.con)
+filters <- listFilters(ensembl.con)
+
+getBM(attributes = c('ensembl_gene_id','external_gene_name'),
+      filters = "ensembl_gene_id",
+      values = ensembl.ids$V1,
+      mart = ensembl.con)
